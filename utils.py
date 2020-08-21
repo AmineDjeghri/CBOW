@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+
 def preprocess_text(text, context_size):
     '''
     Convert text to data:(context, target) for training cbow model
