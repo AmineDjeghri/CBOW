@@ -17,14 +17,14 @@ def preprocess_text(text, context_size):
     '''
     text = text.lower().split()
 
-    #build contexts and targets
+    # Build contexts and targets
     data = list()   
     for i in range(context_size, len(text) - context_size):
         context = text[ i - context_size : i] + text[i+1:i + context_size+1]
         target = text[i]  
         data.append((context, target))
     
-    # map words to index
+    # Map words to index
     vocab=set(text)
     words_to_idx = {w: i for i, w in enumerate(vocab)}
 

@@ -22,22 +22,22 @@ def main():
         text=f.read()
     #text="hi how are you man? congratulations for this. i knew you it. What are you doing?"
 
-    #preprocessing
+    # Preprocessing
     data,words_to_idx=utils.preprocess_text(text,context_size=2)
     idx_to_words = {v: k for k, v in words_to_idx.items()}
 
-    #parameters
+    # Parameters
     CONTEXT_SIZE=2
     EMBEDDING_SIZE=300
     EPOCHS=5
     LEARNING_RATE = 0.001
 
-    #model
+    # Model
     model=models.CBOW(len(words_to_idx),EMBEDDING_SIZE,CONTEXT_SIZE)
     if CUDA:
         model = model.cuda()
 
-    #training
+    # Training
     losses=train(model,data,words_to_idx,EPOCHS,LEARNING_RATE)
     print(losses)
 
