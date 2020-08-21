@@ -33,12 +33,12 @@ def main():
     LEARNING_RATE = 0.001
 
     # Model
-    model = models.CBOW(len(words_to_idx),EMBEDDING_SIZE,CONTEXT_SIZE)
+    model = models.CBOW(len(words_to_idx), EMBEDDING_SIZE, CONTEXT_SIZE)
     if CUDA:
         model = model.cuda()
 
     # Training
-    losses = train(model, data,words_to_idx, EPOCHS,LEARNING_RATE)
+    losses = train(model, data,words_to_idx, EPOCHS, LEARNING_RATE)
     print(losses)
 
 
@@ -55,7 +55,7 @@ def train(model, data, words_to_idx, epochs, lr):
     '''
     loss_func = torch.nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=lr)
-    losses=[]
+    losses = []
 
     for epoch in trange(epochs):
         total_loss = 0
@@ -72,7 +72,6 @@ def train(model, data, words_to_idx, epochs, lr):
 
             total_loss += loss.item()
         losses.append(total_loss)
-    
     return losses
 
 
