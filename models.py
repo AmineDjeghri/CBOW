@@ -18,6 +18,6 @@ class CBOW(nn.Module):
         self.net = nn.Sequential(nn.Linear(context_size*embedding_size*2, 128), nn.ReLU(),  nn.Linear(128, vocab_size))
         
     def forward(self, inputs):
-        embedded  = self.embeddings(inputs).view((1, -1))
+        embedded = self.embeddings(inputs).view((1, -1))
         out = self.net(embedded)
         return out

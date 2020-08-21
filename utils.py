@@ -18,9 +18,9 @@ def preprocess_text(text, context_size):
     text = text.lower().split()
 
     # Build contexts and targets
-    data = list()   
+    data = list() 
     for i in range(context_size, len(text) - context_size):
-        context = text[ i - context_size : i] + text[i+1:i + context_size+1]
+        context = text[i-context_size: i] + text[i+1: i+context_size+1]
         target = text[i]  
         data.append((context, target))
     
@@ -28,10 +28,10 @@ def preprocess_text(text, context_size):
     vocab = set(text)
     words_to_idx = {w: i for i, w in enumerate(vocab)}
 
-    return data,words_to_idx
+    return data, words_to_idx
 
 
-def get_idx_by_word(words,word_to_idx):
+def get_idx_by_word(words, word_to_idx):
     '''
     Retrieve the indexes of given words
 
@@ -39,15 +39,10 @@ def get_idx_by_word(words,word_to_idx):
         words (list of string): 
     
     Return:
-        tensor (Tensor): tensor of indexes 
+        tensor (Tensor): tensor of indexes
     '''
-
     tensor = torch.LongTensor([word_to_idx[word] for word in words])
-    
     if torch.cuda.is_available():
         tensor = tensor.cuda()
 
-    return tensor   
-
-
-
+    return tensor
