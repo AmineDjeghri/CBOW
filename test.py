@@ -20,7 +20,7 @@ def main():
 
     with open("data/en.txt", "r", encoding="utf8") as f:
         text=f.read()
-    text="hi how are you? what are you doing?"
+    #text="hi how are you man? congratulations for this. i knew you it. What are you doing?"
 
     #preprocessing
     data,words_to_idx=utils.preprocess_text(text,context_size=2)
