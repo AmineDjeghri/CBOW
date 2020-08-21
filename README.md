@@ -3,6 +3,7 @@
 ### usefull sources:
 #### lectures
 (there are 30 websites and articles in another file, i will add them later)
+- https://realpython.com/python-pep8/
 - https://machinelearningmastery.com/what-are-word-embeddings/
 - http://hunterheidenreich.com/blog/intro-to-word-embeddings/
 - https://towardsdatascience.com/nlp-101-word2vec-skip-gram-and-cbow-93512ee24314
