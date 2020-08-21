@@ -25,7 +25,7 @@ def preprocess_text(text, context_size):
         data.append((context, target))
     
     # Map words to index
-    vocab=set(text)
+    vocab = set(text)
     words_to_idx = {w: i for i, w in enumerate(vocab)}
 
     return data,words_to_idx
@@ -42,7 +42,7 @@ def get_idx_by_word(words,word_to_idx):
         tensor (Tensor): tensor of indexes 
     '''
 
-    tensor =torch.LongTensor([word_to_idx[word] for word in words])
+    tensor = torch.LongTensor([word_to_idx[word] for word in words])
     
     if torch.cuda.is_available():
         tensor = tensor.cuda()

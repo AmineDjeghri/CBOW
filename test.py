@@ -19,26 +19,27 @@ def main():
     print("pytorch version: ",torch.__version__)
 
     with open("data/en.txt", "r", encoding="utf8") as f:
+        print('file: ',f)
         text=f.read()
-    #text="hi how are you man? congratulations for this. i knew you it. What are you doing?"
+    
 
     # Preprocessing
-    data,words_to_idx=utils.preprocess_text(text,context_size=2)
+    data,words_to_idx = utils.preprocess_text(text,context_size=2)
     idx_to_words = {v: k for k, v in words_to_idx.items()}
 
     # Parameters
-    CONTEXT_SIZE=2
-    EMBEDDING_SIZE=300
-    EPOCHS=5
+    CONTEXT_SIZE = 2
+    EMBEDDING_SIZE = 300
+    EPOCHS = 5
     LEARNING_RATE = 0.001
 
     # Model
-    model=models.CBOW(len(words_to_idx),EMBEDDING_SIZE,CONTEXT_SIZE)
+    model = models.CBOW(len(words_to_idx),EMBEDDING_SIZE,CONTEXT_SIZE)
     if CUDA:
         model = model.cuda()
 
     # Training
-    losses=train(model,data,words_to_idx,EPOCHS,LEARNING_RATE)
+    losses = train(model,data,words_to_idx,EPOCHS,LEARNING_RATE)
     print(losses)
 
 
@@ -58,12 +59,12 @@ def train(model,data,words_to_idx,epochs,lr):
     losses=[]
 
     for epoch in trange(epochs):
-        total_loss=0
+        total_loss = 0
         for context,target in data:
-            context_idx=utils.get_idx_by_word(context,words_to_idx)
-            target_idx=utils.get_idx_by_word([target],words_to_idx)
+            context_idx = utils.get_idx_by_word(context,words_to_idx)
+            target_idx = utils.get_idx_by_word([target],words_to_idx)
 
-            output=model(context_idx)
+            output = model(context_idx)
             loss = loss_func(output, target_idx)
 
             model.zero_grad()
