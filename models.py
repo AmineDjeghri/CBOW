@@ -15,7 +15,10 @@ class CBOW(nn.Module):
         self.embeddings = nn.Embedding(vocab_size, embedding_size)
         if torch.cuda.is_available():
             self.embeddings = self.embeddings.cuda()
-        self.net = nn.Sequential(nn.Linear(context_size*embedding_size*2, 128), nn.ReLU(),  nn.Linear(128, vocab_size))
+        self.net = nn.Sequential(
+            nn.Linear(context_size*embedding_size*2, 128),
+            nn.ReLU(),
+            nn.Linear(128, vocab_size))
         
     def forward(self, inputs):
         embedded = self.embeddings(inputs).view((1, -1))

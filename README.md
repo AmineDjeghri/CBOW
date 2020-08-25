@@ -23,3 +23,6 @@
 - https://rguigoures.github.io/word2vec_pytorch/
 
 - https://srijithr.gitlab.io/post/word2vec/
+
+#### tensorboard pytorch
+https://medium.com/@iamsdt/using-tensorboard-in-google-colab-with-pytorch-458f9bb95212

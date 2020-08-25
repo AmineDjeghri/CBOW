@@ -5,10 +5,14 @@ import torch.optim as optim
 
 from tqdm import trange
 import matplotlib.pyplot as plt
+import sys
 
 import models
-import utils
+from datasets import CBOWDataset
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 
+writer=SummaryWriter("runs/tensorboard")
 
 def main():
     torch.manual_seed(1)
@@ -18,13 +22,7 @@ def main():
         print("GPU name:", torch.cuda.get_device_name())
     print("pytorch version: ", torch.__version__)
 
-    with open("data/en.txt", "r", encoding="utf8") as f:
-        print('file: ', f)
-        text = f.read()
-
-    # Preprocessing
-    data, words_to_idx = utils.preprocess_text(text, context_size=2)
-    idx_to_words = {v: k for k, v in words_to_idx.items()}
+    dataset = CBOWDataset("data/en.txt",context_size=2,max_len=10)
 
     # Parameters
     CONTEXT_SIZE = 2
@@ -33,16 +31,16 @@ def main():
     LEARNING_RATE = 0.001
 
     # Model
-    model = models.CBOW(len(words_to_idx), EMBEDDING_SIZE, CONTEXT_SIZE)
+    model = models.CBOW(len(dataset)+2*CONTEXT_SIZE, EMBEDDING_SIZE, CONTEXT_SIZE)
     if CUDA:
         model = model.cuda()
 
     # Training
-    losses = train(model, data,words_to_idx, EPOCHS, LEARNING_RATE)
+    losses = train(model, dataset, EPOCHS, LEARNING_RATE)
     print(losses)
 
 
-def train(model, data, words_to_idx, epochs, lr):
+def train(model, dataset, epochs, lr):
     '''
     Train a model 
 
@@ -57,21 +55,34 @@ def train(model, data, words_to_idx, epochs, lr):
     optimizer = optim.SGD(model.parameters(), lr=lr)
     losses = []
 
+    #### testing tensor board
+    # data_loader=DataLoader(dataset,batch_size=2,shuffle=True)
+    # examples=iter(data_loader)
+    # example_context,example_target=examples.next()
+    example_context,example_target=dataset[0]
+    writer.add_graph(model, example_context)
+    writer.close()
+
     for epoch in trange(epochs):
         total_loss = 0
-        for context, target in data:
-            context_idx = utils.get_idx_by_word(context, words_to_idx)
-            target_idx = utils.get_idx_by_word([target], words_to_idx)
-
-            output = model(context_idx)
-            loss = loss_func(output, target_idx)
+        corrects=0
+        for i in range(len(dataset)):
+            context=dataset[i][0]
+            target=dataset[i][1]
+            output = model(context)
+            loss = loss_func(output, target)
 
             model.zero_grad()
             loss.backward()
             optimizer.step()
 
             total_loss += loss.item()
+            _, predicted = torch.max(output.data, 1)
+            corrects+= (predicted==target).sum().item()
         losses.append(total_loss)
+        writer.add_scalar('training loss',total_loss/len(dataset),epoch*len(dataset)+i )
+        writer.add_scalar('accuracy',corrects/len(dataset),epoch*len(dataset)+i )
+    
     return losses
 
 
