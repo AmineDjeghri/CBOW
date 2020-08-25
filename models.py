@@ -21,6 +21,8 @@ class CBOW(nn.Module):
             nn.Linear(128, vocab_size))
         
     def forward(self, inputs):
-        embedded = self.embeddings(inputs).view((1, -1))
+        batch=inputs.shape[0]
+        embedded = self.embeddings(inputs)
+        embedded = embedded.view((batch, -1))
         out = self.net(embedded)
         return out
