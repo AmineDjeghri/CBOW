@@ -25,4 +25,5 @@
 - https://srijithr.gitlab.io/post/word2vec/
 
 #### tensorboard pytorch
-https://medium.com/@iamsdt/using-tensorboard-in-google-colab-with-pytorch-458f9bb95212
+vs code and colab tensboardX
+https://towardsdatascience.com/how-to-save-and-load-a-model-in-pytorch-with-a-complete-example-c2920e617dee

@@ -1,10 +1,11 @@
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
+from torch.utils.data.sampler import SubsetRandomSampler
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
+import numpy as np
 
 class CBOWDataset(Dataset):
     def __init__(self, file,context_size,max_len=None):
@@ -88,6 +89,26 @@ def preprocess_text(text, context_size,max_len=None):
     words_to_idx = {w: i for i, w in enumerate(vocab)}
 
     return data, words_to_idx
+
+
+def train_test_split(dataset, batch_size, validation_split, shuffle):
+
+    dataset_size = len(dataset)
+    indices = list(range(dataset_size))
+    split = int(np.floor(validation_split * dataset_size))
+
+    if shuffle :
+        np.random.shuffle(indices)
+    train_indices, test_indices = indices[split:], indices[:split]
+    train_sampler = SubsetRandomSampler(train_indices)
+    test_sampler = SubsetRandomSampler(test_indices)
+
+    train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, 
+                                            sampler=train_sampler)
+    test_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+                                            sampler=test_sampler)
+
+    return train_loader,test_loader
 
 
 if __name__ == '__main__':
