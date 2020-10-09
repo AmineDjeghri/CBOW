@@ -1,11 +1,12 @@
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data import Subset
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
+import re
 
 class CBOWDataset(Dataset):
     def __init__(self, file,context_size,max_len=None):
@@ -13,7 +14,7 @@ class CBOWDataset(Dataset):
         self.context_size=context_size
         self.max_len=max_len
         self._init_dataset()
-
+        self.len_vocab=len(self.words_to_idx)
     def __len__(self):
         return len(self.data)
 
@@ -59,6 +60,37 @@ class CBOWDataset(Dataset):
             words.append(self.idx_to_words[i])
         return words
 
+class WordsIdxDataset:
+    def __init__(self, words_to_idx ):
+        self.words_to_idx = words_to_idx
+        self.idx_to_words = {v: k for k, v in self.words_to_idx.items()}
+    
+    def get_idx_by_words(self,words):
+        '''
+        Retrieve the indexes of given words
+
+        Parameters:
+            words (list of string): 
+        
+        Return:
+            tensor (Tensor): tensor of indexes
+        '''
+        tensor = torch.LongTensor([self.words_to_idx[word] for word in words])
+        if torch.cuda.is_available():
+            tensor = tensor.cuda()
+
+        return tensor
+
+    def get_words_by_idx(self,idx):
+        """
+        return the word of a given indices
+        Parameters:
+            idx (list of indices): 
+        """
+        words=[]
+        for i in idx:
+            words.append(self.idx_to_words[i])
+        return words
 
 def preprocess_text(text, context_size,max_len=None):
     '''
@@ -72,8 +104,9 @@ def preprocess_text(text, context_size,max_len=None):
         data (tuple): data in form of (context, target)
         words_to_idx(dict): dict containing a mapping word->index
     '''
-    text = text.lower().split()
-
+    text = text.lower().replace('\n', ' ')
+    text = re.sub('[^a-z ]+', '', text)
+    text=text.split()
     if max_len:
         text=text[:max_len]
     
@@ -100,19 +133,20 @@ def train_test_split(dataset, batch_size, validation_split, shuffle):
     if shuffle :
         np.random.shuffle(indices)
     train_indices, test_indices = indices[split:], indices[:split]
-    train_sampler = SubsetRandomSampler(train_indices)
-    test_sampler = SubsetRandomSampler(test_indices)
+    train_subset = Subset(dataset,train_indices)
+    test_subset = Subset(dataset,test_indices)
 
-    train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, 
-                                            sampler=train_sampler)
-    test_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-                                            sampler=test_sampler)
+    train_loader = torch.utils.data.DataLoader(train_subset, batch_size=batch_size)
+    test_loader = torch.utils.data.DataLoader(test_subset, batch_size=batch_size)
 
+    print('number of batchs in train set: ',len(train_loader))
+    print('number of batchs in valid set: ',len(test_loader))
     return train_loader,test_loader
 
 
+
 if __name__ == '__main__':
-    dataset = CBOWDataset("data/en.txt",context_size=2,max_len=10)
+    dataset = CBOWDataset("data/en.txt",context_size=2,max_len=20)
     print(len(dataset))
     print(dataset[1])
     print(dataset.words_to_idx)
@@ -122,3 +156,9 @@ if __name__ == '__main__':
     dataloader = DataLoader(dataset, batch_size=5, shuffle=True, num_workers=2)
     for i, batch in enumerate(dataloader):
         print(i, batch)
+    train,test=train_test_split(dataset,batch_size=2,validation_split=0.2,shuffle=False)
+    for i, batch in enumerate(train):
+        print(i, batch)
+    for i, batch in enumerate(test):
+        print(i, batch)
+    
